@@ -26,7 +26,7 @@ build-release: #This will be executed if you push on master, it makes a new rele
   only:
     - master
   script:
-    - echo "building branch $CI_COMMIT_REF_NAME, Version $version"
+    - echo "building branch $CI_COMMIT_REF_NAME"
     - sudo docker image prune -f #Delete old unused images
     - sudo docker pull openjdk:8-jdk
     - sudo docker build -t gitlab.jonasled.de/jonasled/docker-image-android-ci . #Build the image with the name already set to push
