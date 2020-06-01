@@ -11,9 +11,11 @@ ENV PATH "$PATH:${ANDROID_HOME}/tools"
 #Make a complete system update. apt-utils is needed for configuring packages, so we need to install it
 RUN apt update
 RUN apt upgrade -y
-RUN apt install -y wget tar unzip lib32stdc++6 lib32z1 vim-common xxd python python-pip python3 python3-pip curl
+RUN apt install -y tar unzip lib32stdc++6 lib32z1 vim-common xxd python python-pip python3 python3-pip curl
+RUN pip3 install gitlab-auto-release
 RUN curl -o android-sdk.zip https://dl.google.com/android/repository/commandlinetools-linux-${COMMANDLINE_TOOLS}_latest.zip
 RUN unzip -d android-sdk-linux android-sdk.zip > /dev/null
+RUN rm android-sdk.zip
 RUN mv android-sdk-linux/ ${ANDROID_HOME}
 RUN echo y | ${ANDROID_HOME}/tools/bin/sdkmanager --sdk_root=${ANDROID_HOME} "platforms;android-${ANDROID_COMPILE_SDK}" >/dev/null
 RUN echo y | ${ANDROID_HOME}/tools/bin/sdkmanager --sdk_root=${ANDROID_HOME} "platform-tools" >/dev/null
