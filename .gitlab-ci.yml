@@ -1,0 +1,34 @@
+image: docker
+
+services:
+  - docker:dind
+
+stages:
+  - build
+  - build-release
+
+
+build: #This will be executed on every push. It builds an docker image, which is named after the branch, so you can always use the last state of the different branches.
+  stage: build
+  except:
+    - master
+  script:
+    - echo "building for branch $CI_COMMIT_REF_NAME"
+    - sudo docker image prune -f #Delete old unused images
+    - sudo docker pull openjdk:8-jdk
+    - sudo docker build -t gitlab.jonasled.de/jonasled/docker-image-android-ci:$CI_COMMIT_REF_NAME . #Build the image with the name already set to push
+    - sudo docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY #Login to docker registry, username and password will be filled while executing
+    - sudo docker push gitlab.jonasled.de/jonasled/docker-image-android-ci:$CI_COMMIT_REF_NAME #Push the image onto the Docker registry.
+
+
+build-release: #This will be executed if you push on master, it makes a new release (latest) image
+  stage: build
+  only:
+    - master
+  script:
+    - echo "building branch $CI_COMMIT_REF_NAME, Version $version"
+    - sudo docker image prune -f #Delete old unused images
+    - sudo docker pull openjdk:8-jdk
+    - sudo docker build -t gitlab.jonasled.de/jonasled/docker-image-android-ci . #Build the image with the name already set to push
+    - sudo docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY #Login to docker registry, username and password will be filled while executing
+    - sudo docker push gitlab.jonasled.de/jonasled/docker-image-android-ci #Push the image onto the Docker registry.
